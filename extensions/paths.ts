@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { createRequire } from "node:module";
-import { homedir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { lstat, realpath } from "node:fs/promises";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import type { WorktreeState } from "./state.js";
@@ -103,6 +103,8 @@ export async function routePath(state: WorktreeState, inputPath: string): Promis
       reason = "main checkout absolute path remapped";
     } else if (isPiManagedPath(resolve(raw)) || isPiManagedPath(abs)) {
       return { input: inputPath, routedPath: abs, repoRelative: "", reason: "pi-managed absolute path allowed" };
+    } else if (isTempPath(resolve(raw)) || isTempPath(abs)) {
+      return { input: inputPath, routedPath: abs, repoRelative: "", reason: "temp path allowed" };
     } else {
       throw new Error(`Blocked path outside active worktree: ${inputPath}`);
     }
@@ -122,6 +124,11 @@ export async function routePath(state: WorktreeState, inputPath: string): Promis
   if (isSiblingWorktreePath(repoRoot, worktreeRoot, safetyReal)) throw new Error(`Blocked sibling worktree path: ${inputPath}`);
 
   return { input: inputPath, routedPath, repoRelative, reason };
+}
+
+function isTempPath(target: string): boolean {
+  const tmp = resolve(tmpdir());
+  return inside(tmp, resolve(target));
 }
 
 export function routeCommand(command: string, state: WorktreeState): string {
