@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { realpath } from "node:fs/promises";
 import test from "node:test";
 import { routePath } from "./paths.js";
@@ -55,6 +55,18 @@ test("allows pi-managed absolute path", async () => {
     if (previousHome === undefined) delete process.env.HOME;
     else process.env.HOME = previousHome;
   }
+});
+
+test("allows temp absolute path", async () => {
+  const { state } = await fixture();
+  const tmpFile = join(tmpdir(), "pi-worktree-test-" + Date.now(), "artifact.json");
+  await mkdir(dirname(tmpFile), { recursive: true });
+  await writeFile(tmpFile, JSON.stringify({ x: 1 }));
+  const routed = await routePath(state, tmpFile);
+  assert.equal(routed.routedPath, await realpath(tmpFile));
+  assert.equal(routed.reason, "temp path allowed");
+  // cleanup
+  await rm(dirname(tmpFile), { recursive: true, force: true });
 });
 
 test("blocks outside path", async () => {
