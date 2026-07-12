@@ -9,7 +9,13 @@ import { registerWorktreeTools } from "./tools.js";
 
 const ACTIVATION_RE = /\b(use (a )?worktree|use worktree|don't touch main checkout|do not touch main checkout|isolate this task|isolated worktree)\b/i;
 
+/** Delegated children inherit extensions but must not own root worktree routing. */
+export function isDelegatedChild(environment = process.env): boolean {
+  return environment.PI_SUBAGENT === "1";
+}
+
 export default function piWorktree(pi: ExtensionAPI) {
+  if (isDelegatedChild()) return;
   let state: WorktreeState | undefined;
 
   function refreshFooter(ctx?: any) {
