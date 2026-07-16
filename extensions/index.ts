@@ -139,7 +139,7 @@ export default function piWorktree(pi: ExtensionAPI) {
     label: "bash (pi-worktree routed)",
     promptGuidelines: [
       "When pi-worktree is active, bash runs with cwd set to PI_WORKTREE_ROOT and must not mutate the main checkout.",
-      "Use worktree_diff, worktree_sync, worktree_commit, and worktree_stop for worktree lifecycle operations.",
+      "Use worktree_diff, worktree_sync, and worktree_stop for worktree lifecycle operations. Commit with direct git commit; create PRs with gh pr create.",
     ],
   });
 }
