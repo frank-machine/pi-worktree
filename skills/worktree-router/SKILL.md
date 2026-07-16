@@ -17,7 +17,7 @@ Behavior:
 - Use `worktree_status` to verify active root and branch.
 - Use `worktree_diff` for review.
 - Use `worktree_sync` to rebase active worktree onto latest upstream.
-- Use `worktree_commit` only after explicit confirmation.
+- Commit with direct `git commit`; create PRs with `gh pr create`.
 - Use `worktree_stop` to deactivate; remove dirty worktrees only after rescue/review.
 
 Never intentionally read or mutate the main checkout while pi-worktree is active.
